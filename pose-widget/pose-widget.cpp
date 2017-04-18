@@ -20,8 +20,8 @@ using namespace pose_widget_impl;
 
 pose_transform::pose_transform(QWidget* dst) :
     dst(dst),
-    image(w, h, QImage::Format_ARGB32_Premultiplied),
-    image2(w, h, QImage::Format_ARGB32_Premultiplied),
+    image(w, h, QImage::Format_ARGB32),
+    image2(w, h, QImage::Format_ARGB32),
     width(w), height(h),
     fresh(false)
 {
@@ -335,10 +335,6 @@ void pose_transform::project_quad_texture()
 
                     dest[pos + k] = uc((i * ax + i__ * ax_) * ay + (i___ * ax + i_ * ax_) * ay_);
                 }
-
-                // premultiply alpha
-                for (int k = 0; k < 3; k++)
-                    dest[pos + k] = (dest[pos+k]*num(dest[pos + 3]))/255;
             }
         }
 
@@ -355,7 +351,7 @@ vec2 pose_transform::project(const vec3 &point)
     using std::fabs;
 
     vec3 ret = rotation * point;
-    num z = std::max<num>(.5, 1 + translation.z()/-80);
+    num z = std::fmax<num>(.5, 1 + translation.z()/-80);
     num w = width, h = height;
     num x = w * translation.x() / 2 / -80;
     if (fabs(x) > w/2)
